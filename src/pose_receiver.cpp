@@ -1,22 +1,18 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
-#include "gazebo_msgs/ModelStates.h"
-#include <string>
 #include "geometry_msgs/PoseStamped.h"
-
 #include "tf/transform_datatypes.h"
 #include <tf/LinearMath/Matrix3x3.h>
 #include <math.h>
-
-// geometry_msgs::PoseStamped posePtr;
+// #include "gazebo_msgs/ModelStates.h"
 
 // 전역에 new PoseStamped 메시지 생성 
 geometry_msgs::PoseStamped receivedMsg;
 geometry_msgs::PoseStamped alreadySentMsg;
 
+ros::Publisher pose_pub;
+
 double RadianToDegree(double radian) {
     double degree =  radian * 180.0 / M_PI;
-     
     return degree;
 }
 
@@ -28,7 +24,6 @@ double RPY_RadianToDegree(double roll, double pitch, double yaw) {
 void poseSubCallback(const geometry_msgs::Pose msg)
 {
     ROS_INFO("Subscribe pose");
-
     receivedMsg.pose = msg;
 
 //Position 변환 (x, y, z --> x, -y, -z)
@@ -67,10 +62,17 @@ void poseSubCallback(const geometry_msgs::Pose msg)
     tf::Matrix3x3(myQuaternion).getRPY(roll, pitch, yaw);
     RPY_RadianToDegree(roll, pitch, yaw);
 
-
 // 부가 정보
     receivedMsg.header.seq++;
     receivedMsg.header.stamp = ros::Time::now();
+
+// Publish to MAVROS
+    if(alreadySentMsg.header.seq != receivedMsg.header.seq)
+    {
+        pose_pub.publish(receivedMsg);
+        alreadySentMsg = receivedMsg;
+        ROS_INFO("seq: %d, publish PoseStamped",receivedMsg.header.seq);
+    }   
 
 }
 
@@ -82,22 +84,9 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     alreadySentMsg = receivedMsg;
-
     ros::Subscriber pose_sub = n.subscribe("hd_indoor/pose", 1000, poseSubCallback);
-    ros::Publisher pose_pub = n.advertise<geometry_msgs::PoseStamped>("/mavros/vision_pose/pose", 1000);
-
-    ros::Rate loop_rate(100); // 단위 Hz
-
-    while (ros::ok())
-    {
-        if(alreadySentMsg.header.seq != receivedMsg.header.seq){
-            pose_pub.publish(receivedMsg);
-            alreadySentMsg = receivedMsg;
-             ROS_INFO("seq: %d, publish PoseStamped",receivedMsg.header.seq);
-        }
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+    
+    pose_pub = n.advertise<geometry_msgs::PoseStamped>("/mavros/vision_pose/pose", 1000);
 
     ros::spin();
     return 0;

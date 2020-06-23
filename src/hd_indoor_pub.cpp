@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         // pose..x = x;
         // pose.position.y = y;
 
-        ROS_INFO("HD_point publish" );       
+        ROS_INFO("hd_indoor pose publish" );       
 
         hd_pub.publish(pose);
 

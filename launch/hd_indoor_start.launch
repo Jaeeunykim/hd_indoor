@@ -1,0 +1,20 @@
+<launch>
+        <!-- vim: set ft=xml noet : -->
+        <!-- base node launch file-->
+        <node pkg="hd_indoor"  type="pose_receiver" name="pose_receiver"  output="screen"/>
+
+        <arg name="fcu_url" default="/dev/ttyUSB0:921600" />
+        <arg name="gcs_url" default=""/>
+        <arg name="tgt_system" default="1"/>
+        <arg name="tgt_component" default="1"/>
+        <arg name="pluginlists_yaml"/>
+
+        <node pkg="mavros" type="mavros_node" name="mavros" output="screen">
+                <param name="fcu_url" value="$(arg fcu_url)" />
+                <param name="gcs_url" value="$(arg gcs_url)" />
+                <param name="target_system_id" value="$(arg tgt_system)" />
+                <param name="target_component_id" value="$(arg tgt_component)" />
+                <param name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+        </node>
+
+</launch>

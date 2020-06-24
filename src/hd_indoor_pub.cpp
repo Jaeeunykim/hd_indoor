@@ -1,52 +1,72 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 #include "geometry_msgs/Pose.h"
 
-#include <sstream>
+#include "tf/tf.h"
+
+
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "hd_indoor");
+    ros::init(argc, argv, "hd_indoor"); 
     ros::NodeHandle n;
-
-    ros::Publisher hd_pub = n.advertise<geometry_msgs::Pose>("hd_indoor/pose", 1000);
+    ros::Publisher hd_pub = n.advertise<geometry_msgs::Pose>("hd_indoor/pose", 1000); 
     ros::Rate loop_rate(10);
-
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-    float w = 0.0;
-
-    while (ros::ok())
-    {
+    
+    int rotation = 0; 
+    float px = 0.0; 
+    float py = 0.0; 
+    float pz = 0.0;
+    
+    tf::Quaternion qt; 
+    
+    while (ros::ok()) { 
         geometry_msgs::Pose pose;
-
-        pose.position.x = x;
-        pose.position.y = y;
-        pose.position.z = z;
-        pose.orientation.x = 0.022260;
-        pose.orientation.y = 0.439680;
-        pose.orientation.z = 0.360424;
-        pose.orientation.w =  0.822363;
-
-        // quaternion.x = x;
-        // quaternion.y = y;
-        // quaternion.z = z;
-        // quaternion.w = w;
-        // pose..x = x;
-        // pose.position.y = y;
-
-        ROS_INFO("hd_indoor pose publish" );       
+        px = py = pz = 0.0;
+        qt[0] = 0.0; 
+        qt[1] = 0.0; 
+        qt[2] = 0.0; 
+        qt[3] = 1.0; //w
+        
+        rotation = rotation %4;
+        switch(rotation){ 
+            case 0 : 
+                break; 
+            case 1 : 
+                px = 1000.0; 
+                qt.setRPY(0.523599,0,0); 
+                qt.normalize(); 
+                break; 
+            case 2 : 
+                py = 1000.0; 
+                qt.setRPY(0,0.523599,0); 
+                qt.normalize(); 
+                break; 
+            case 3: 
+                pz = 1000.0; 
+                qt.setRPY(0,0,0.523599); 
+                t.normalize(); 
+                break; 
+            default : 
+            break; 
+        }
+            
+        pose.position.x = px; 
+        pose.position.y = py; 
+        pose.position.z = pz; 
+        pose.orientation.x = qt[0]; 
+        pose.orientation.y = qt[1]; 
+        pose.orientation.z = qt[2]; 
+        pose.orientation.w = qt[3];
+        
+        ROS_INFO("HD_point publish" ); 
 
         hd_pub.publish(pose);
 
         ros::spinOnce();
 
         loop_rate.sleep();
-        ++x;
-        ++y;
-        ++z;
-        ++w;
+
+        rotation++; 
     }
 
     return 0;

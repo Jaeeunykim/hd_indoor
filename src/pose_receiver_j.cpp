@@ -13,7 +13,7 @@ ros::Publisher pose_pub;
 void poseSubCallback(const geometry_msgs::Pose msg){
 
     geometry_msgs::PoseStamped receivedMsg; 
-    receivedMsg.pose = msg;
+    receivedMsg.pose= msg;
     
     //단위 변환 mm -> m 
     receivedMsg.pose.position.x = receivedMsg.pose.position.x/1000;

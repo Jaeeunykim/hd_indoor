@@ -44,7 +44,7 @@ int main(int argc, char **argv)
             case 3: 
                 pz = 1000.0; 
                 qt.setRPY(0,0,0.523599); 
-                t.normalize(); 
+                qt.normalize(); 
                 break; 
             default : 
             break; 

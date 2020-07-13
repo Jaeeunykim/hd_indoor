@@ -3,7 +3,7 @@
         <!-- base node launch file-->
         <node pkg="hd_indoor"  type="pose_receiver" name="pose_receiver"  output="screen"/>
 
-        <arg name="fcu_url" default="/dev/ttyACM0:921600" />
+        <arg name="fcu_url" default="/dev/ttyUSB0:921600" />
         <arg name="gcs_url" default=""/>
         <arg name="tgt_system" default="1"/>
         <arg name="tgt_component" default="1"/>

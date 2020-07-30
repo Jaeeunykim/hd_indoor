@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-sudo chmod 777 /dev/ttyUSB0
+source /home/ubuntu/catkin_ws/devel/setup.bash
 roslaunch hd_indoor hd_indoor_start.launch
